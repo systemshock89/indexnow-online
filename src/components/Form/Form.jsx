@@ -71,6 +71,7 @@ function Form() {
                 headers: {
                     'Content-Type': 'application/json',
                     'charset': 'utf-8',
+                    'Cache-Control': 'no-cache',
                 },
                 body: JSON.stringify(data),
             });
