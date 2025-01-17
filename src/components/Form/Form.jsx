@@ -9,6 +9,7 @@ function Form() {
     const [messageType, setMessageType] = useState('');
     const [error, setError] = useState({ inputText: '', textarea: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
 
     const isValidUrl = (url) => {
         try {
@@ -47,9 +48,13 @@ function Form() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validateForm() || isSubmitting) return;
+        if (!validateForm() || isSubmitting) {
+            setShowAlert(false);  // скрываем alert при ошибке валидации
+            return;
+        }
 
         setIsSubmitting(true);
+        setShowAlert(false);  // Скрываем ошибку, если форма валидна, но еще не отправлена
 
         const urls = textarea.split('\n').map((url) => url.trim()).filter(Boolean);
         const host = urls[0] ? new URL(urls[0]).hostname : '';
@@ -62,7 +67,6 @@ function Form() {
 
         try {
             const response = await fetch('https://mastweb.ru/classes/IndexNowProxy.php', {
-            // const response = await fetch('https://yandex.com/indexnow', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,20 +75,28 @@ function Form() {
                 body: JSON.stringify(data),
             });
 
-            // Ответ от сервера
             const result = await response.json();
-            setMessage(`Ответ от сервера: ${JSON.stringify(result)}`);
-            setMessageType('success');
 
-            setInputText('');
-            setTextarea('');
-            setError({ inputText: '', textarea: '' });
+            // Обрабатываем ответ
+            if (result.success) {
+                setMessage('Отправка произошла успешно');
+                setMessageType('success');
+
+                // Очищаем форму после успешной отправки
+                setInputText('');
+                setTextarea('');
+                setError({ inputText: '', textarea: '' });
+            } else {
+                setMessage(`Ошибка при отправке: ${JSON.stringify(result.message)}`);
+                setMessageType('error');
+            }
         } catch (error) {
             setMessage(`Ошибка при отправке: ${error.message}`);
             setMessageType('error');
             setError({ inputText: '', textarea: '' });
         } finally {
             setIsSubmitting(false);
+            setShowAlert(true);  // Показываем alert после отправки
         }
     };
 
@@ -93,7 +105,7 @@ function Form() {
     };
 
     const renderAlert = () => {
-        if (message) {
+        if (showAlert && message) {  // Показать alert только если showAlert === true
             return (
                 <div style={{ marginTop: '20px' }}>
                     <Alert severity={messageType} sx={{ width: '100%' }}>
