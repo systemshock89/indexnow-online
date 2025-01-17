@@ -3,11 +3,11 @@ import { TextField, Button, Alert, Paper, Box, Typography } from '@mui/material'
 import './Form.scss';
 
 function Form() {
-    const [inputText, setInputText] = useState('');  // key
-    const [textarea, setTextarea] = useState('');    // urlList
-    const [message, setMessage] = useState('');      // Для вывода результатов
-    const [messageType, setMessageType] = useState('');  // Для определения типа сообщения (error или success)
-    const [error, setError] = useState({ inputText: '', textarea: '' });  // Для вывода ошибок по каждому полю
+    const [inputText, setInputText] = useState('');
+    const [textarea, setTextarea] = useState('');
+    const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
+    const [error, setError] = useState({ inputText: '', textarea: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isValidUrl = (url) => {
@@ -19,10 +19,9 @@ function Form() {
         }
     };
 
-    // Валидация формы
     const validateForm = () => {
+        const newError = { inputText: '', textarea: '' };
         let formIsValid = true;
-        let newError = { inputText: '', textarea: '' };
 
         if (!inputText) {
             newError.inputText = 'Пожалуйста, введите ключ для верификации.';
@@ -33,8 +32,8 @@ function Form() {
             newError.textarea = 'Пожалуйста, введите хотя бы одну ссылку.';
             formIsValid = false;
         } else {
-            const urls = textarea.split('\n').map(url => url.trim()).filter(Boolean);
-            const invalidUrls = urls.filter(url => !isValidUrl(url));
+            const urls = textarea.split('\n').map((url) => url.trim()).filter(Boolean);
+            const invalidUrls = urls.filter((url) => !isValidUrl(url));
             if (invalidUrls.length > 0) {
                 newError.textarea = 'Некоторые ссылки имеют неправильный формат.';
                 formIsValid = false;
@@ -45,7 +44,6 @@ function Form() {
         return formIsValid;
     };
 
-    // Функция отправки данных
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -53,7 +51,7 @@ function Form() {
 
         setIsSubmitting(true);
 
-        const urls = textarea.split('\n').map(url => url.trim()).filter(Boolean);
+        const urls = textarea.split('\n').map((url) => url.trim()).filter(Boolean);
         const host = urls[0] ? new URL(urls[0]).hostname : '';
 
         const data = {
@@ -63,7 +61,8 @@ function Form() {
         };
 
         try {
-            const response = await fetch('https://yandex.com/indexnow', {
+            const response = await fetch('https://mastweb.ru/classes/IndexNowProxy.php', {
+            // const response = await fetch('https://yandex.com/indexnow', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,11 +71,11 @@ function Form() {
                 body: JSON.stringify(data),
             });
 
+            // Ответ от сервера
             const result = await response.json();
             setMessage(`Ответ от сервера: ${JSON.stringify(result)}`);
             setMessageType('success');
 
-            // Очищаем форму после успешной отправки
             setInputText('');
             setTextarea('');
             setError({ inputText: '', textarea: '' });
@@ -139,7 +138,13 @@ function Form() {
                         placeholder="https://www.example.com/url1"
                         onFocus={() => handleFocus('textarea')}
                     />
-                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2, width: 220 }}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        sx={{ marginTop: 2, width: 220 }}
+                    >
                         Отправить
                     </Button>
 
