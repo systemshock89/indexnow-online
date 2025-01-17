@@ -9,3 +9,8 @@
 
 ## Документация:
 https://yandex.ru/support/webmaster/indexing-options/index-now.html
+
+## Используется:
+- React
+- MaterialUI
+- Vite
